@@ -1,26 +1,41 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, MessageCircle, Wallet, CreditCard } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { BRAND } from "@/lib/menu";
 import { toast } from "sonner";
+
+type PayMethod = "whatsapp" | "cod" | "online";
+
+const METHOD_LABEL: Record<PayMethod, string> = {
+  whatsapp: "WhatsApp Order",
+  cod: "Cash on Delivery",
+  online: "Pay Online (Card)",
+};
 
 export function CheckoutModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { items, subtotal, delivery, total, clear } = useCart();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [method, setMethod] = useState<PayMethod>("whatsapp");
 
   if (!open) return null;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!items.length) return;
+
+    if (method === "online") {
+      toast.info("Online card payments coming soon — please use WhatsApp or COD for now.");
+      return;
+    }
+
     const lines = items.map((i, idx) => `${idx + 1}. ${i.name} x${i.qty} — Rs ${i.qty * i.price}`).join("\n");
     const msg =
       `*🔥 New Order — ${BRAND.name}*\n\n` +
       `*Items:*\n${lines}\n\n` +
       `Subtotal: Rs ${subtotal}\nDelivery: Rs ${delivery}\n*Total: Rs ${total}*\n\n` +
-      `*Customer:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n*Payment:* Cash on Delivery`;
+      `*Customer:* ${name}\n*Phone:* ${phone}\n*Address:* ${address}\n*Payment:* ${METHOD_LABEL[method]}`;
     const url = `https://wa.me/${BRAND.whatsapp}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
     toast.success("Redirecting to WhatsApp…");
