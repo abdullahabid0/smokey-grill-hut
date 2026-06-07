@@ -105,3 +105,28 @@ function Field({
     </label>
   );
 }
+
+function PayOption({
+  id, current, onSelect, icon, title, desc, badge,
+}: { id: PayMethod; current: PayMethod; onSelect: (m: PayMethod) => void; icon: React.ReactNode; title: string; desc: string; badge?: string }) {
+  const active = current === id;
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(id)}
+      className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-all ${active ? "border-flame bg-flame/10" : "border-border bg-card hover:border-flame/50"}`}
+    >
+      <span className={`flex h-8 w-8 items-center justify-center rounded-full ${active ? "bg-flame text-flame-foreground" : "bg-surface-elevated text-muted-foreground"}`}>
+        {icon}
+      </span>
+      <span className="flex-1">
+        <span className="flex items-center gap-2 text-sm font-semibold">
+          {title}
+          {badge && <span className="rounded-full bg-gold/20 px-2 py-0.5 text-[10px] font-bold text-gold">{badge}</span>}
+        </span>
+        <span className="block text-[11px] text-muted-foreground">{desc}</span>
+      </span>
+      <span className={`h-4 w-4 rounded-full border-2 ${active ? "border-flame bg-flame" : "border-border"}`} />
+    </button>
+  );
+}
